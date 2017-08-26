@@ -8,7 +8,7 @@ namespace Control_Work
     public class Ticket : IEquatable<Ticket>
     {
 
-        public Ticket(string location, int cost)
+        public Ticket(string location, double cost)
         {
             Location = location;
             Cost = cost;
@@ -17,7 +17,7 @@ namespace Control_Work
 
         public string Location { get; set; }
 
-        public int Cost { get; set; }
+        public double Cost { get; set; }
 
         public bool Equals(Ticket other)
         {
@@ -33,7 +33,7 @@ namespace Control_Work
 
         public override string ToString()
         {
-            return string.Format("Направление:{0} - Цнеа:{1} ", Location, Cost);
+            return string.Format("{0,10} |{1,4}\n", Location, Cost);
         }
 
     }
@@ -57,7 +57,7 @@ namespace Control_Work
             this.passportnumber = passportnumber;
         }
 
-        public Person(string FIO, string seria, long passportnumber,bool bpercentdiscount,int discountvalue)
+        public Person(string FIO, string seria, long passportnumber,bool bpercentdiscount,double discountvalue)
         {
             this.FIO = FIO;
             this.seria = seria;
@@ -69,7 +69,7 @@ namespace Control_Work
 
         public bool bPercentDiscount = false;
 
-        public int discountValue;
+        public double discountValue;
 
         public string FIO;
 
@@ -81,25 +81,27 @@ namespace Control_Work
 
         public List<Ticket> Tickets = new List<Ticket>();
 
-        public void ShowInfoTicket()
+        public override string ToString()
         {
-            Console.WriteLine("Билеты:");
+            string temp = string.Format("{0},{1}{2}\n", FIO, seria, passportnumber);
+
+            temp += "Билеты:\n";
 
             foreach (Ticket item in Tickets)
             {
-                Console.WriteLine("{0} {1}", item.Location, item.Cost);
+                temp+= item.ToString();
             }
 
-            Console.WriteLine();
+            return temp;
         }
 
-        public bool AddTicket(string location, int cost)
+        public bool AddTicket(string location, double cost)
         {
             if (discountValue >= 0)
             {
                 if (bPercentDiscount)
                 {
-                    cost -= cost / discountValue;
+                    cost -= discountValue*cost/100;
                 }
 
                 else
@@ -129,17 +131,13 @@ namespace Control_Work
 
     public class Kassa
     {
-        public Kassa()
-        {
-
-        }
 
         List<Person> PersonList = new List<Person>();
 
         List<Ticket> TarifList = new List<Ticket>();
 
 
-        public void AddTarif(int cost, string location)
+        public void AddTarif(double cost, string location)
         {
             Ticket tarif = new Ticket(location, cost);
 
@@ -163,10 +161,28 @@ namespace Control_Work
             return TarifList[number];
         }
 
-        public void ShowAverangeCostTicket()
+        public double GetSumTicket(string Location)
         {
-            int sum = 0;
-            int count = 0;
+            double sum = 0.0f;
+
+            foreach (Person person in PersonList)
+            {
+                foreach(Ticket ticket in person.Tickets)
+                {
+                    if(ticket.Location == Location)
+                    {
+                        sum += ticket.Cost;
+                    }
+                }
+            }
+
+                return sum;
+        }
+
+        public double ShowAverangeCostTicket()
+        {
+            double sum = 0;
+            double count = 0;
 
             foreach(Person person in PersonList)
             {
@@ -185,15 +201,19 @@ namespace Control_Work
             }
 
             Console.WriteLine("Расчет средней стоимости проданных билетов {0}",avsum);
+
+            return avsum;
         }
 
-        public void ShowAllKassaInfo()
+        public override string ToString()
         {
+            string temp = string.Empty;
+
             if (TarifList.Count > 0)
             {
                 foreach (Ticket tarif in TarifList)
                 {
-                    Console.WriteLine("{0} {1}", tarif.Location, tarif.Cost);
+                    temp+=tarif.ToString();
                 }
             }
 
@@ -206,8 +226,7 @@ namespace Control_Work
             {
                 foreach (Person person in PersonList)
                 {
-                    Console.WriteLine("{0},{1}{2}", person.FIO, person.seria, person.passportnumber);
-                    person.ShowInfoTicket();
+                    temp+=person.ToString();
                 }
             }
 
@@ -215,6 +234,9 @@ namespace Control_Work
             {
                 Console.WriteLine("Список пассажиров пуст");
             }
+
+
+            return temp;
         }
 
         public void ShowListTarif()
@@ -225,7 +247,7 @@ namespace Control_Work
             {
                 foreach (var Item in TarifList)
                 {
-                    Console.WriteLine("{0}: {1} - {2}",i,Item.Location, Item.Cost);
+                    Console.Write(i.ToString()+" "+Item.ToString());
 
                     i++;
                 }
@@ -248,7 +270,8 @@ namespace Control_Work
                 Console.WriteLine("1 - Добавить тариф");
                 Console.WriteLine("2 - Добавить пассажира и загеристрировать билет");
                 Console.WriteLine("3 - Рассчет средней стоимости проданных билетов");
-                Console.WriteLine("4 - Вывести всю информацию по кассе");
+                Console.WriteLine("4 - Расчет суммы проданных билетов с учетом предоставленных скидок по введенному наименованию направления");
+                Console.WriteLine("5 - Вывести всю информацию по кассе");
                 Console.WriteLine("0 - Выход");
                 Console.Write("Выберите пункт меню: ");
 
@@ -262,7 +285,7 @@ namespace Control_Work
                         Console.Write("Направление:");
                         string location = Console.ReadLine();
                         Console.Write("Цена:");
-                        int cost = int.Parse(Console.ReadLine());
+                        double cost = double.Parse(Console.ReadLine());
 
                         kassa.AddTarif(cost, location);
 
@@ -329,12 +352,21 @@ namespace Control_Work
 
                     else if (inputMenu == 3)
                     {
+
                         kassa.ShowAverangeCostTicket();
                     }
 
                     else if (inputMenu == 4)
                     {
-                        kassa.ShowAllKassaInfo();
+                        Console.Write("Введите направление:");
+                        string location = Console.ReadLine();
+
+                        Console.WriteLine("Сумма билетов с направлением {0} - {1}",location,kassa.GetSumTicket(location));
+                    }
+
+                    else if (inputMenu == 5)
+                    {
+                        Console.WriteLine(kassa.ToString());
                     }
 
                     else if (inputMenu == 0)
