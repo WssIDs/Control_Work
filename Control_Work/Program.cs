@@ -4,7 +4,9 @@ using System.Text;
 
 namespace Control_Work
 {
-
+    /// <summary>
+    /// Класс Билет
+    /// </summary>
     public class Ticket : IEquatable<Ticket>
     {
 
@@ -14,11 +16,21 @@ namespace Control_Work
             Cost = cost;
         }
 
-
+        /// <summary>
+        /// Направление
+        /// </summary>
         public string Location { get; set; }
 
+        /// <summary>
+        /// Цена
+        /// </summary>
         public double Cost { get; set; }
 
+        /// <summary>
+        /// Сравнение 
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool Equals(Ticket other)
         {
             if (this.Location == other.Location)
@@ -31,6 +43,9 @@ namespace Control_Work
             }
         }
 
+        /// <summary>
+        /// Вывод данных по билету
+        /// </summary>
         public override string ToString()
         {
             return string.Format("{0,10} |{1,4}\n", Location, Cost);
@@ -38,25 +53,11 @@ namespace Control_Work
 
     }
 
-
+    /// <summary>
+    /// Класс пассажир
+    /// </summary>
     public class Person
     {
-        public Person(string FIO, string seria,long passportnumber, DateTime dateIn, DateTime dateOut)
-        {
-            this.FIO = FIO;
-            this.seria = seria;
-            this.passportnumber = passportnumber;
-            this.dateIn = dateIn;
-            this.dateOut = dateOut;
-        }
-
-        public Person(string FIO, string seria, long passportnumber)
-        {
-            this.FIO = FIO;
-            this.seria = seria;
-            this.passportnumber = passportnumber;
-        }
-
         public Person(string FIO, string seria, long passportnumber,bool bpercentdiscount,double discountvalue)
         {
             this.FIO = FIO;
@@ -67,20 +68,39 @@ namespace Control_Work
 
         }
 
+        /// <summary>
+        /// Использование процентной скидки (true - процентная, false - фиксированая)
+        /// </summary>
         public bool bPercentDiscount = false;
 
+        /// <summary>
+        /// Скидка
+        /// </summary>
         public double discountValue;
 
+        /// <summary>
+        /// ФИО пассажира
+        /// </summary>
         public string FIO;
 
+        /// <summary>
+        /// Серия паспорта
+        /// </summary>
         public string seria;
+
+        /// <summary>
+        /// Номер пасспорта
+        /// </summary>
         public long passportnumber;
 
-        DateTime dateIn;
-        DateTime dateOut;
-
+        /// <summary>
+        /// Список билетов пассажира
+        /// </summary>
         public List<Ticket> Tickets = new List<Ticket>();
 
+        /// <summary>
+        /// Вывод информации о пассажире и приобретенных билетах
+        /// </summary>
         public override string ToString()
         {
             string temp = string.Format("{0},{1}{2}\n", FIO, seria, passportnumber);
@@ -95,6 +115,12 @@ namespace Control_Work
             return temp;
         }
 
+        /// <summary>
+        /// Добавление билета
+        /// </summary>
+        /// <param name="location">Направление</param>
+        /// <param name="cost">Цена</param>
+        /// <returns></returns>
         public bool AddTicket(string location, double cost)
         {
             if (discountValue >= 0)
@@ -129,14 +155,28 @@ namespace Control_Work
         }
     }
 
+    /// <summary>
+    /// Класс Касса
+    /// </summary>
     public class Kassa
     {
 
+        /// <summary>
+        /// Список пассажиров
+        /// </summary>
         List<Person> PersonList = new List<Person>();
 
+        /// <summary>
+        /// Список тарифов
+        /// </summary>
         List<Ticket> TarifList = new List<Ticket>();
 
 
+        /// <summary>
+        /// Добавить тариф
+        /// </summary>
+        /// <param name="cost">Цена</param>
+        /// <param name="location">Направление</param>
         public void AddTarif(double cost, string location)
         {
             Ticket tarif = new Ticket(location, cost);
@@ -147,6 +187,14 @@ namespace Control_Work
             }
         }
 
+        /// <summary>
+        /// Добавить пассажира
+        /// </summary>
+        /// <param name="fio">ФИО</param>
+        /// <param name="seria">серия паспорта</param>
+        /// <param name="passportnumber">номер паспорта</param>
+        /// <param name="bpercentdiscount">процентная скидка</param>
+        /// <param name="discountvalue">скидка</param>
         public Person AddPerson(string fio,string seria, long passportnumber,bool bpercentdiscount, int discountvalue)
         {
             Person person = new Person(fio, seria, passportnumber,bpercentdiscount,discountvalue);
@@ -156,11 +204,20 @@ namespace Control_Work
             return person;
         }
 
+        /// <summary>
+        /// Получить тариф по значению
+        /// </summary>
+        /// <param name="number">номер тарифа</param>
+        /// <returns></returns>
         public Ticket GetTarif(int number)
         {
             return TarifList[number];
         }
 
+        /// <summary>
+        /// Получить сумму приобретенных билетов по направлению
+        /// </summary>
+        /// <param name="Location">Направление</param>
         public double GetSumTicket(string Location)
         {
             double sum = 0.0f;
@@ -239,6 +296,9 @@ namespace Control_Work
             return temp;
         }
 
+        /// <summary>
+        /// Вывод списка тарифов
+        /// </summary>
         public void ShowListTarif()
         {
             int i = 0;
